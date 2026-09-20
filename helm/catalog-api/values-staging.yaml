@@ -1,0 +1,29 @@
+# Staging: shaped like prod (so it's a meaningful pre-prod signal) but
+# smaller, and image tag is promoted manually/by pipeline gate rather than
+# auto-bumped on every merge (see docs/DECISIONS.md - promotion strategy).
+image:
+  tag: "REPLACED_BY_PROMOTION_PIPELINE"
+
+replicaCount: 2
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 75
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+secrets:
+  enabled: true
+  vaultPath: "secret/data/staging/catalog-api"

@@ -1,0 +1,23 @@
+# Dev: optimize for fast iteration, not resilience or cost efficiency.
+image:
+  tag: dev-local   # overwritten automatically by Jenkins on every merge to main
+
+replicaCount: 1
+
+autoscaling:
+  enabled: false   # predictable single replica, easier to debug
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+podDisruptionBudget:
+  enabled: false   # a single replica has nothing to "disrupt" gracefully
+
+secrets:
+  enabled: true
+  vaultPath: "secret/data/dev/catalog-api"

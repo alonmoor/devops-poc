@@ -1,0 +1,65 @@
+# Baseline defaults. Environment-specific values files (values-dev.yaml,
+# values-staging.yaml, values-prod.yaml) override only what actually needs
+# to differ - this keeps the diff between environments small and reviewable
+# in a PR, instead of three fully-duplicated 200-line files that drift.
+
+image:
+  repository: registry.example.com/devops-poc/catalog-api
+  tag: dev-local
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+service:
+  port: 8080
+
+# No Ingress block at all for this chart's defaults - catalog-api is
+# internal-only by design. It is never given an externally-routable
+# Ingress in ANY environment (see docs/DECISIONS.md).
+
+serviceAccount:
+  create: true
+  # Deliberately NOT auto-mounting the default token unless the pod
+  # actually needs to call the Kubernetes API (this one doesn't).
+  automountServiceAccountToken: false
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 75
+
+networkPolicy:
+  enabled: true
+  # Only orders-api may call catalog-api. Enforced via podSelector match
+  # on orders-api's pod label, not just namespace - namespace-only
+  # isolation still allows any pod in a shared namespace to reach it.
+  allowFromApp: orders-api
+
+probes:
+  liveness:
+    path: /healthz
+  readiness:
+    path: /readyz
+  startup:
+    path: /healthz
+    failureThreshold: 18
+    periodSeconds: 5     
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
+secrets:
+  # Populated by External Secrets Operator, not by Helm/Jenkins.
+  # See helm/catalog-api/templates/externalsecret.yaml.
+  enabled: false
+  vaultPath: ""

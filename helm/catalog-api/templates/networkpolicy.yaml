@@ -1,0 +1,25 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "app.name" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "app.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  ingress:
+    # Only pods carrying the orders-api label may reach catalog-api -
+    # this is pod-selector based, not namespace-based, so it holds even
+    # if other teams later share this namespace.
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ .Values.networkPolicy.allowFromApp }}
+      ports:
+        - protocol: TCP
+          port: 8080
+{{- end }}

@@ -1,0 +1,29 @@
+# Prod: tuned for resilience and headroom under load. Image tag is bumped
+# ONLY via the explicit promotion pipeline after a staging soak period -
+# never auto-bumped on merge (see Jenkinsfile "GitOps: Bump Image Tag").
+image:
+  tag: "REPLACED_BY_PROMOTION_PIPELINE"
+
+replicaCount: 3
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2   # tolerate 1 node drain / voluntary disruption at a time
+
+secrets:
+  enabled: true
+  vaultPath: "secret/data/prod/catalog-api"

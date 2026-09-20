@@ -1,0 +1,50 @@
+terraform {
+  required_providers {
+    kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.31" }
+    vault      = { source = "hashicorp/vault", version = "~> 4.4" }
+  }
+  backend "s3" {
+    bucket = "devops-poc-tfstate"
+    key    = "prod/namespace.tfstate"
+    region = "eu-west-1"
+  }
+}
+
+provider "kubernetes" {
+  config_path    = "~/.kube/config"
+  config_context = "prod-cluster"
+}
+
+provider "vault" {
+  address = "https://vault.internal.example.com"
+}
+
+module "catalog_namespace" {
+  source      = "../../modules/namespace"
+  environment = "prod"
+  namespace   = "catalog-prod"
+  team_group  = "team-platform-oncall" # NOT the app team - prod RBAC goes to on-call/platform only
+
+  resource_quota = {
+    requests_cpu    = "8"
+    requests_memory = "16Gi"
+    limits_cpu      = "16"
+    limits_memory   = "32Gi"
+    pods            = 50
+  }
+}
+
+module "orders_namespace" {
+  source      = "../../modules/namespace"
+  environment = "prod"
+  namespace   = "orders-prod"
+  team_group  = "team-platform-oncall"
+
+  resource_quota = {
+    requests_cpu    = "8"
+    requests_memory = "16Gi"
+    limits_cpu      = "16"
+    limits_memory   = "32Gi"
+    pods            = 50
+  }
+}

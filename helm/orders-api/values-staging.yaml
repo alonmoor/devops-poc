@@ -1,0 +1,26 @@
+image:
+  tag: "REPLACED_BY_PROMOTION_PIPELINE"
+
+replicaCount: 2
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+
+ingress:
+  enabled: true
+  className: nginx
+  host: "orders.staging.example.com"
+  tlsSecretName: "orders-staging-tls"   # provisioned by cert-manager
+
+resources:
+  requests: { cpu: 50m, memory: 64Mi }
+  limits: { cpu: 200m, memory: 128Mi }
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+secrets:
+  enabled: true
+  vaultPath: "secret/data/staging/orders-api"

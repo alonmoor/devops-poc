@@ -1,0 +1,92 @@
+# Two ApplicationSets instead of one with conditional templating: the sync
+# policy difference between "auto-heal, non-prod" and "human-gated, prod"
+# is the single most important control in this whole file, so it's kept
+# as two separately-readable objects rather than hidden inside a Go
+# template conditional that's easy to misread in a PR diff.
+#
+# WORKING ASSUMPTION: at 8-team scale the "list" generator below would
+# more likely be a Git-directory generator (auto-discovers a folder per
+# service). Kept as an explicit list here so the matrix stays readable.
+
+---
+# --- dev + staging: ArgoCD auto-syncs and self-heals ---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: devops-poc-services-autosync
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - service: catalog-api
+                - service: orders-api
+          - list:
+              elements:
+                - env: dev
+                - env: staging
+  template:
+    metadata:
+      name: "{{service}}-{{env}}"
+      labels:
+        environment: "{{env}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://git.example.com/platform/devops-poc.git
+        targetRevision: main
+        path: "helm/{{service}}"
+        helm:
+          valueFiles:
+            - "values.yaml"
+            - "values-{{env}}.yaml"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{service}}-{{env}}"
+      syncPolicy:
+        automated:
+          prune: true       # remove resources deleted from Git
+          selfHeal: true    # revert manual kubectl drift back to Git state
+        syncOptions:
+          - CreateNamespace=false   # namespaces are Terraform-owned, not ArgoCD-owned - see docs/DECISIONS.md
+          - PrunePropagationPolicy=foreground
+
+---
+# --- prod: ArgoCD detects drift (OutOfSync) but never applies automatically.
+# A human, or the gated promotion pipeline, must run `argocd app sync`. ---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: devops-poc-services-manual-prod
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - service: catalog-api
+          - service: orders-api
+  template:
+    metadata:
+      name: "{{service}}-prod"
+      labels:
+        environment: prod
+      annotations:
+        # Surfaced in the ArgoCD UI/notifications so on-call knows a sync
+        # is pending human action, not silently stuck.
+        notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: devops-releases
+    spec:
+      project: default
+      source:
+        repoURL: https://git.example.com/platform/devops-poc.git
+        targetRevision: main
+        path: "helm/{{service}}"
+        helm:
+          valueFiles:
+            - "values.yaml"
+            - "values-prod.yaml"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{service}}-prod"
+      syncPolicy: {}   # deliberately empty - no "automated:" block means manual-only sync

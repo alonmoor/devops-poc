@@ -1,0 +1,27 @@
+image:
+  tag: "REPLACED_BY_PROMOTION_PIPELINE"
+
+replicaCount: 3
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 12
+  targetCPUUtilizationPercentage: 65   # scale out earlier than staging - customer-facing
+
+ingress:
+  enabled: true
+  className: nginx
+  host: "orders.example.com"
+  tlsSecretName: "orders-prod-tls"
+
+resources:
+  requests: { cpu: 100m, memory: 128Mi }
+  limits: { cpu: 500m, memory: 256Mi }
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+secrets:
+  enabled: true
+  vaultPath: "secret/data/prod/orders-api"

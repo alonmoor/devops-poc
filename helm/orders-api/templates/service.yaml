@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "app.name" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  # Still ClusterIP - even though this service IS externally reachable,
+  # external exposure is layered on top via Ingress (below), not by
+  # changing the Service type to LoadBalancer/NodePort. This keeps a
+  # single, consistent ingress/TLS/observability chokepoint across all
+  # externally-facing services instead of N ad-hoc LoadBalancers.
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      name: http
+  selector:
+    {{- include "app.selectorLabels" . | nindent 4 }}

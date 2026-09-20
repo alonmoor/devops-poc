@@ -1,0 +1,6 @@
+apiVersion: v2
+name: orders-api
+description: Customer-facing order service (the only service exposed externally)
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

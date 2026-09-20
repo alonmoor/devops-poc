@@ -1,0 +1,61 @@
+image:
+  repository: registry.example.com/devops-poc/orders-api
+  tag: dev-local
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+env:
+  # Just the Service name + port - the full cluster-internal FQDN
+  # (catalog-api.<namespace>.svc.cluster.local) is assembled in
+  # templates/deployment.yaml using .Release.Namespace, since values.yaml
+  # itself is plain YAML and is NOT run through the Helm template engine.
+  catalogApiServiceName: "catalog-api"
+  catalogApiPort: 8080
+  catalogApiNamespace: "catalog-dev"
+  catalogApiNamespace: "catalog-dev"
+
+service:
+  port: 8080
+
+ingress:
+  enabled: false
+  className: nginx
+  host: ""
+  tlsSecretName: ""
+
+serviceAccount:
+  create: true
+  automountServiceAccountToken: false
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 75
+
+networkPolicy:
+  enabled: true
+  ingressControllerNamespace: ingress-nginx
+
+probes:
+  liveness:
+    path: /healthz
+  readiness:
+    path: /readyz
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
+secrets:
+  enabled: false
+  vaultPath: ""

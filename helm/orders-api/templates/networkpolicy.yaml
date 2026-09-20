@@ -1,0 +1,48 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "app.name" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "app.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Only traffic that has already passed through the ingress controller
+    # may reach this pod - matched by namespace, since the controller pod
+    # itself is managed outside this app's charts.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.networkPolicy.ingressControllerNamespace }}
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    # 1) Allowed to call catalog-api - and NOTHING else in-cluster. This
+    #    is the egress-side mirror of catalog-api's own ingress
+    #    NetworkPolicy (helm/catalog-api/templates/networkpolicy.yaml) -
+    #    both ends of the same call are independently locked down, so
+    #    either policy alone would already block any other path.
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: catalog-api
+      ports:
+        - protocol: TCP
+          port: 8080
+    # 2) DNS - without this, service-name resolution itself breaks and
+    #    the pod can't even find catalog-api's ClusterIP.
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+{{- end }}
