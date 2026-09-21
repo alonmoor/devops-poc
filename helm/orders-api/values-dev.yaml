@@ -1,5 +1,5 @@
 image:
-  tag: dev-local
+  tag: v1
 
 replicaCount: 1
 autoscaling:

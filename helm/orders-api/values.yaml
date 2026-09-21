@@ -1,6 +1,6 @@
 image:
-  repository: registry.example.com/devops-poc/orders-api
-  tag: dev-local
+  repository: 192.168.1.24:5000/orders-api
+  tag: v1
   pullPolicy: IfNotPresent
 
 replicaCount: 1

@@ -9,7 +9,7 @@
 # service). Kept as an explicit list here so the matrix stays readable.
 
 ---
-# --- dev + staging: ArgoCD auto-syncs and self-heals ---
+# --- dev: ArgoCD auto-syncs and self-heals ---
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
@@ -26,7 +26,6 @@ spec:
           - list:
               elements:
                 - env: dev
-                - env: staging
   template:
     metadata:
       name: "{{service}}-{{env}}"

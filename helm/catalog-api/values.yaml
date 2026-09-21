@@ -4,8 +4,8 @@
 # in a PR, instead of three fully-duplicated 200-line files that drift.
 
 image:
-  repository: registry.example.com/devops-poc/catalog-api
-  tag: dev-local
+  repository: 192.168.1.24:5000/catalog-api
+  tag: v2
   pullPolicy: IfNotPresent
 
 replicaCount: 1
