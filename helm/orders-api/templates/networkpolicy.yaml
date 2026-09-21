@@ -23,19 +23,24 @@ spec:
       ports:
         - protocol: TCP
           port: 8080
+
+
   egress:
-    # 1) Allowed to call catalog-api - and NOTHING else in-cluster. This
-    #    is the egress-side mirror of catalog-api's own ingress
-    #    NetworkPolicy (helm/catalog-api/templates/networkpolicy.yaml) -
-    #    both ends of the same call are independently locked down, so
-    #    either policy alone would already block any other path.
+    # 1) Allowed to call catalog-api specifically in catalog-dev - and
+    #    NOTHING else in-cluster. Both namespaceSelector and podSelector
+    #    sit under the same "to" list item on purpose (AND, not OR) -
+    #    mirrors the ingress-side fix in catalog-api's NetworkPolicy.
     - to:
-        - podSelector:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.networkPolicy.catalogApiNamespace }}
+          podSelector:
             matchLabels:
               app.kubernetes.io/name: catalog-api
       ports:
         - protocol: TCP
           port: 8080
+
     # 2) DNS - without this, service-name resolution itself breaks and
     #    the pod can't even find catalog-api's ClusterIP.
     - to:

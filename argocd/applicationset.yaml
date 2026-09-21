@@ -35,7 +35,7 @@ spec:
     spec:
       project: default
       source:
-        repoURL: https://git.example.com/platform/devops-poc.git
+        repoURL: https://github.com/alonmoor/devops-poc.git
         targetRevision: main
         path: "helm/{{service}}"
         helm:
@@ -79,7 +79,7 @@ spec:
     spec:
       project: default
       source:
-        repoURL: https://git.example.com/platform/devops-poc.git
+        repoURL: https://github.com/alonmoor/devops-poc.git
         targetRevision: main
         path: "helm/{{service}}"
         helm:

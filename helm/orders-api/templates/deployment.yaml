@@ -21,6 +21,11 @@ spec:
       annotations:
         checksum/secret: {{ .Values.secrets.enabled | ternary (printf "%v" .Release.Revision) "none" }}
     spec:
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: pycache
+          emptyDir: {}
       serviceAccountName: {{ include "app.name" . }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
       securityContext:
@@ -53,6 +58,17 @@ spec:
             readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
+          startupProbe:
+            httpGet:
+              path: {{ .Values.probes.startup.path }}
+              port: http
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}      
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: pycache
+              mountPath: /app/src/__pycache__  
           livenessProbe:
             httpGet:
               path: {{ .Values.probes.liveness.path }}

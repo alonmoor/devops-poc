@@ -43,6 +43,7 @@ networkPolicy:
   # on orders-api's pod label, not just namespace - namespace-only
   # isolation still allows any pod in a shared namespace to reach it.
   allowFromApp: orders-api
+  allowFromNamespace: orders-dev  
 
 probes:
   liveness:

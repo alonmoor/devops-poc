@@ -11,15 +11,21 @@ spec:
       {{- include "app.selectorLabels" . | nindent 6 }}
   policyTypes:
     - Ingress
+
   ingress:
-    # Only pods carrying the orders-api label may reach catalog-api -
-    # this is pod-selector based, not namespace-based, so it holds even
-    # if other teams later share this namespace.
+    # Only pods carrying the orders-api label, AND specifically in the
+    # orders-dev namespace, may reach catalog-api. Both selectors sit
+    # under the same "from" list item on purpose - that makes it an AND,
+    # not an OR (two separate list items would mean "this label in ANY
+    # namespace, OR any pod in that namespace" - much too permissive).
     - from:
-        - podSelector:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.networkPolicy.allowFromNamespace }}
+          podSelector:
             matchLabels:
               app.kubernetes.io/name: {{ .Values.networkPolicy.allowFromApp }}
       ports:
         - protocol: TCP
-          port: 8080
+          port: 8080    
 {{- end }}
