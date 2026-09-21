@@ -19,7 +19,7 @@ spec:
       labels:
         {{- include "app.selectorLabels" . | nindent 8 }}
       annotations:
-        checksum/secret: {{ .Values.secrets.enabled | ternary (printf "%v" .Release.Revision) "none" }}
+        checksum/secret: "{{ .Values.secrets.enabled | ternary (printf "%v" .Release.Revision) "none" }}"
     spec:
       volumes:
         - name: tmp

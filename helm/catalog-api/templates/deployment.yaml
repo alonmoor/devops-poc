@@ -27,7 +27,7 @@ spec:
         # the Deployment spec itself didn't change - ESO updates the
         # underlying Secret object in place, which doesn't trigger a
         # rollout on its own.
-        checksum/secret: {{ .Values.secrets.enabled | ternary (printf "%v" .Release.Revision) "none" }}
+        checksum/secret: "{{ .Values.secrets.enabled | ternary (printf "%v" .Release.Revision) "none" }}"
     spec:
       volumes:
         - name: tmp
