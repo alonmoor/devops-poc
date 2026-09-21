@@ -22,7 +22,9 @@ spec:
           - list:
               elements:
                 - service: catalog-api
+                  nsPrefix: catalog
                 - service: orders-api
+                  nsPrefix: orders
           - list:
               elements:
                 - env: dev
@@ -43,7 +45,7 @@ spec:
             - "values-{{env}}.yaml"
       destination:
         server: https://kubernetes.default.svc
-        namespace: "{{service}}-{{env}}"
+        namespace: "{{nsPrefix}}-{{env}}"
       syncPolicy:
         automated:
           prune: true       # remove resources deleted from Git
@@ -65,7 +67,9 @@ spec:
     - list:
         elements:
           - service: catalog-api
+            nsPrefix: catalog
           - service: orders-api
+            nsPrefix: orders
   template:
     metadata:
       name: "{{service}}-prod"
@@ -87,5 +91,5 @@ spec:
             - "values-prod.yaml"
       destination:
         server: https://kubernetes.default.svc
-        namespace: "{{service}}-prod"
+        namespace: "{{nsPrefix}}-prod"
       syncPolicy: {}   # deliberately empty - no "automated:" block means manual-only sync
