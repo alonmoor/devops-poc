@@ -98,3 +98,4 @@ apply --dry-run=client -f -` לפני כל שימוש אמיתי — זה הצע
 
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) — החלטות, חלופות שנשקלו, ופשרות
 - [`docs/SECRETS.md`](docs/SECRETS.md) — זרימת ניהול הסודות המלאה
+# devops-poc
