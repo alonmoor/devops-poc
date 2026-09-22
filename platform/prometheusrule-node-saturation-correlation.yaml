@@ -1,0 +1,29 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: node-saturation-app-correlation
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: node-saturation-correlation.rules
+      rules:
+        - alert: AppPodOnSaturatedNode
+          expr: |
+            (
+              (
+                node_load1 * on(instance) group_left(nodename) node_uname_info
+              ) > 10
+            )
+            * on(nodename) group_right(pod, namespace)
+            label_replace(
+              kube_pod_info{namespace=~"catalog-dev|catalog-prod|orders-dev|orders-prod"},
+              "nodename", "$1", "node", "(.+)"
+            )
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "{{ $labels.namespace }}/{{ $labels.pod }} רץ על צומת רווי ({{ $labels.nodename }})"
+            description: "הצומת {{ $labels.nodename }} שמארח את {{ $labels.namespace }}/{{ $labels.pod }} מציג load average (1m) מעל 10 במשך יותר מ-5 דקות (ערך נוכחי: {{ $value | printf \"%.1f\" }}). מדדי ה-container של הפוד עצמו יכולים להיראות תקינים לגמרי בזמן שהצומת המארח עמוס-יתר - כדאי לבדוק latency/timeouts באפליקציה."
