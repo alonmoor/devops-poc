@@ -27,3 +27,6 @@ podDisruptionBudget:
 secrets:
   enabled: true
   vaultPath: "secret/data/prod/catalog-api"
+
+networkPolicy:
+  allowFromNamespace: orders-prod
