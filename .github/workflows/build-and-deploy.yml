@@ -1,0 +1,83 @@
+name: Build and Deploy API Images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'catalog-api/**'
+      - 'orders-api/**'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      catalog: ${{ steps.filter.outputs.catalog }}
+      orders: ${{ steps.filter.outputs.orders }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            catalog:
+              - 'catalog-api/**'
+            orders:
+              - 'orders-api/**'
+
+  build-catalog-api:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.catalog == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push catalog-api image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./catalog-api
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/catalog-api:${{ github.sha }}
+      - name: Bump image tag in values-dev.yaml
+        run: |
+          sed -i "s|tag:.*|tag: \"${{ github.sha }}\"|" helm/catalog-api/values-dev.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add helm/catalog-api/values-dev.yaml
+          git commit -m "ci: bump catalog-api image to ${{ github.sha }}"
+          git push
+
+  build-orders-api:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.orders == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push orders-api image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./orders-api
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/orders-api:${{ github.sha }}
+      - name: Bump image tag in values-dev.yaml
+        run: |
+          sed -i "s|tag:.*|tag: \"${{ github.sha }}\"|" helm/orders-api/values-dev.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add helm/orders-api/values-dev.yaml
+          git commit -m "ci: bump orders-api image to ${{ github.sha }}"
+          git push
