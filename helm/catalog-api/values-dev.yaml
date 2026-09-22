@@ -1,7 +1,7 @@
 # Dev: optimize for fast iteration, not resilience or cost efficiency.
 image:
   repository: ghcr.io/alonmoor/catalog-api
-  tag: "75768e97a7871450d090a5f5a5716bf2221d4bc4"
+  tag: "0ac8b947f88699f70f2b18d3c7365fd2ab964495"
 replicaCount: 1
 autoscaling:
   enabled: false # predictable single replica, easier to debug
