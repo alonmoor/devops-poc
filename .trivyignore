@@ -1,0 +1,12 @@
+# CVEs in the Debian 13 base image (util-linux, ncurses, systemd, perl-base)
+# with no upstream-fixed version available yet, as of 2026-09-22.
+# Re-evaluate periodically and remove entries once a patched Debian point
+# release / base image rebuild is available.
+CVE-2026-76642
+CVE-2026-78408
+CVE-2026-78409
+CVE-2026-78410
+CVE-2025-69720
+CVE-2026-54369
+CVE-2026-16742
+CVE-2026-9538
