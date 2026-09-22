@@ -78,3 +78,4 @@ def get_order(order_id: str):
 @app.get("/version")
 def version():
     return {"version": os.getenv("IMAGE_TAG", "dev-local")}
+# retry after respx fix
