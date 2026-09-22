@@ -62,3 +62,4 @@ def version():
 # CI test comment - triggers build-and-deploy workflow
 # trigger full pipeline test
 # retry after trivy-action tag fix
+# retry after httpx2 fix
