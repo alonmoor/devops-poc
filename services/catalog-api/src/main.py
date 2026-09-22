@@ -63,3 +63,4 @@ def version():
 # trigger full pipeline test
 # retry after trivy-action tag fix
 # retry after httpx2 fix
+# trigger CI after Node24 action upgrade
