@@ -1,6 +1,6 @@
 # Dev: optimize for fast iteration, not resilience or cost efficiency.
 image:
-  tag: v2   # overwritten automatically by Jenkins on every merge to main
+  tag: "0e618781ac3a6b382067c943867762fc3d1ffb8b"
 
 replicaCount: 1
 
