@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'catalog-api/**'
-      - 'orders-api/**'
+      - 'services/catalog-api/**'
+      - 'services/orders-api/**'
 
 permissions:
   contents: write
@@ -24,9 +24,9 @@ jobs:
         with:
           filters: |
             catalog:
-              - 'catalog-api/**'
+              - 'services/catalog-api/**'
             orders:
-              - 'orders-api/**'
+              - 'services/orders-api/**'
 
   build-catalog-api:
     needs: detect-changes
@@ -43,7 +43,7 @@ jobs:
       - name: Build and push catalog-api image
         uses: docker/build-push-action@v5
         with:
-          context: ./catalog-api
+          context: ./services/catalog-api
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/catalog-api:${{ github.sha }}
       - name: Bump image tag in values-dev.yaml
@@ -70,7 +70,7 @@ jobs:
       - name: Build and push orders-api image
         uses: docker/build-push-action@v5
         with:
-          context: ./orders-api
+          context: ./services/orders-api
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/orders-api:${{ github.sha }}
       - name: Bump image tag in values-dev.yaml
