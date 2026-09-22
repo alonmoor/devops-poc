@@ -1,11 +1,9 @@
 image:
   repository: ghcr.io/alonmoor/orders-api
-  tag: v1
-
+  tag: 1a4b53b2493c409f883dca49238f1144d2d66b18
 replicaCount: 1
 autoscaling:
   enabled: false
-
 ingress:
   # Enabled even in dev so the full request path (Ingress -> orders-api ->
   # catalog-api) can be exercised locally against kind/minikube's own
@@ -13,15 +11,12 @@ ingress:
   enabled: true
   className: traefik
   host: "orders.dev.local"
-  tlsSecretName: ""   # no TLS in dev - self-signed local ingress is enough
-
+  tlsSecretName: "" # no TLS in dev - self-signed local ingress is enough
 resources:
-  requests: { cpu: 25m, memory: 32Mi }
-  limits: { cpu: 500m, memory: 64Mi }
-
+  requests: {cpu: 25m, memory: 32Mi}
+  limits: {cpu: 500m, memory: 64Mi}
 podDisruptionBudget:
   enabled: false
-
 secrets:
   enabled: true
   vaultPath: "secret/data/dev/orders-api"
