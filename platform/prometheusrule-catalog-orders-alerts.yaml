@@ -1,0 +1,58 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: catalog-orders-app-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: catalog-orders.rules
+      rules:
+        - alert: AppHighMemoryUsage
+          expr: |
+            (
+              container_memory_working_set_bytes{namespace=~"catalog-.*|orders-.*", container=~"catalog-api|orders-api"}
+              /
+              container_spec_memory_limit_bytes{namespace=~"catalog-.*|orders-.*", container=~"catalog-api|orders-api"}
+            ) > 0.85
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "{{ $labels.namespace }}/{{ $labels.pod }} memory usage above 85% of its limit"
+            description: "Container {{ $labels.container }} in {{ $labels.namespace }}/{{ $labels.pod }} has used more than 85% of its memory limit for 10 minutes. Current value: {{ $value | humanizePercentage }}."
+
+        - alert: AppHighCPUThrottling
+          expr: |
+            (
+              rate(container_cpu_cfs_throttled_periods_total{namespace=~"catalog-.*|orders-.*", container=~"catalog-api|orders-api"}[5m])
+              /
+              rate(container_cpu_cfs_periods_total{namespace=~"catalog-.*|orders-.*", container=~"catalog-api|orders-api"}[5m])
+            ) > 0.25
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "{{ $labels.namespace }}/{{ $labels.pod }} is being CPU throttled"
+            description: "Container {{ $labels.container }} in {{ $labels.namespace }}/{{ $labels.pod }} was CPU-throttled more than 25% of the time over the last 10 minutes - consider raising its CPU limit."
+
+        - alert: AppNoHealthyReplicas
+          expr: |
+            kube_deployment_status_replicas_available{namespace=~"catalog-.*|orders-.*", deployment=~"catalog-api|orders-api"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "{{ $labels.namespace }}/{{ $labels.deployment }} has zero healthy replicas"
+            description: "Deployment {{ $labels.deployment }} in {{ $labels.namespace }} has had 0 available replicas for 5 minutes - the service is likely down."
+
+        - alert: AppImagePullBackOff
+          expr: |
+            kube_pod_container_status_waiting_reason{namespace=~"catalog-.*|orders-.*", container=~"catalog-api|orders-api", reason="ImagePullBackOff"} == 1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "{{ $labels.namespace }}/{{ $labels.pod }} cannot pull its image"
+            description: "Container {{ $labels.container }} in {{ $labels.namespace }}/{{ $labels.pod }} has been stuck in ImagePullBackOff for 5 minutes - check the image tag/registry."
