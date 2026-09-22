@@ -1,5 +1,6 @@
 # Dev: optimize for fast iteration, not resilience or cost efficiency.
 image:
+  repository: ghcr.io/alonmoor/catalog-api
   tag: "0e618781ac3a6b382067c943867762fc3d1ffb8b"
 
 replicaCount: 1

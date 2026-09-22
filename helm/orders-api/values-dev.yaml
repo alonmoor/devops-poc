@@ -1,4 +1,5 @@
 image:
+  repository: ghcr.io/alonmoor/orders-api
   tag: v1
 
 replicaCount: 1
