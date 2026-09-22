@@ -47,7 +47,7 @@ jobs:
         run: |
           python3 -m venv .venv
           . .venv/bin/activate
-          pip install --quiet -r requirements.txt pytest httpx2
+          pip install --quiet -r requirements.txt pytest httpx2 respx
           pytest tests/ -v --junitxml=test-results.xml
 
       - name: Upload test results
@@ -129,7 +129,7 @@ jobs:
         run: |
           python3 -m venv .venv
           . .venv/bin/activate
-          pip install --quiet -r requirements.txt pytest httpx2
+          pip install --quiet -r requirements.txt pytest httpx2 respx
           pytest tests/ -v --junitxml=test-results.xml
 
       - name: Upload test results
