@@ -2,7 +2,7 @@
 # ONLY via the explicit promotion pipeline after a staging soak period -
 # never auto-bumped on merge (see Jenkinsfile "GitOps: Bump Image Tag").
 image:
-  tag: "REPLACED_BY_PROMOTION_PIPELINE"
+  tag: "v2"
 
 replicaCount: 3
 

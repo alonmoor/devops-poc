@@ -1,5 +1,5 @@
 image:
-  tag: "REPLACED_BY_PROMOTION_PIPELINE"
+  tag: "v1"
 
 replicaCount: 3
 autoscaling:

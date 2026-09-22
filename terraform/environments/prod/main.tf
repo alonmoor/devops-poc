@@ -3,20 +3,18 @@ terraform {
     kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.31" }
     vault      = { source = "hashicorp/vault", version = "~> 4.4" }
   }
-  backend "s3" {
-    bucket = "devops-poc-tfstate"
-    key    = "prod/namespace.tfstate"
-    region = "eu-west-1"
+  backend "local" {
+    path = "terraform-prod.tfstate"
   }
 }
 
 provider "kubernetes" {
   config_path    = "~/.kube/config"
-  config_context = "prod-cluster"
+  config_context = "kubernetes-admin@kubernetes"
 }
 
 provider "vault" {
-  address = "https://vault.internal.example.com"
+  address = "http://127.0.0.1:8200"
 }
 
 module "catalog_namespace" {
