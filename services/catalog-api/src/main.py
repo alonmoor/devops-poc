@@ -59,3 +59,4 @@ def version():
     # Populated at build time via IMAGE_TAG env var - lets us verify
     # which immutable image tag is actually running in a given environment.
     return {"version": os.getenv("IMAGE_TAG", "dev-local")}
+# CI test comment - triggers build-and-deploy workflow
