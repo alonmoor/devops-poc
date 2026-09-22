@@ -32,52 +32,160 @@ jobs:
     needs: detect-changes
     if: needs.detect-changes.outputs.catalog == 'true'
     runs-on: ubuntu-latest
+    env:
+      SERVICE_DIR: services/catalog-api
+      IMAGE: ghcr.io/${{ github.repository_owner }}/catalog-api:${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests
+        working-directory: ${{ env.SERVICE_DIR }}
+        run: |
+          python3 -m venv .venv
+          . .venv/bin/activate
+          pip install --quiet -r requirements.txt pytest
+          pytest tests/ -v --junitxml=test-results.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-api-test-results
+          path: ${{ env.SERVICE_DIR }}/test-results.xml
+
+      - name: SAST - dependency and static analysis (report-only)
+        working-directory: ${{ env.SERVICE_DIR }}
+        run: |
+          . .venv/bin/activate
+          pip install --quiet pip-audit bandit
+          pip-audit -r requirements.txt --format json --output pip-audit-report.json || true
+          bandit -r src/ -f json -o bandit-report.json || true
+
+      - name: Upload SAST reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-api-sast-reports
+          path: ${{ env.SERVICE_DIR }}/*-report.json
+
+      - name: Build image (local, for scanning)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ env.SERVICE_DIR }}
+          push: false
+          load: true
+          tags: ${{ env.IMAGE }}
+
+      - name: Container scan - Trivy (blocking on HIGH/CRITICAL)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.IMAGE }}
+          severity: HIGH,CRITICAL
+          exit-code: 1
+          format: table
+
       - name: Log in to ghcr.io
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push catalog-api image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./services/catalog-api
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/catalog-api:${{ github.sha }}
-      - name: Bump image tag in values-dev.yaml
+
+      - name: Push image
+        run: docker push ${{ env.IMAGE }}
+
+      - name: GitOps - bump image tag in values-dev.yaml
         run: |
-          sed -i "s|tag:.*|tag: \"${{ github.sha }}\"|" helm/catalog-api/values-dev.yaml
+          sudo wget -q https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+          sudo chmod +x /usr/local/bin/yq
+          yq -i '.image.tag = "${{ github.sha }}"' helm/catalog-api/values-dev.yaml
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add helm/catalog-api/values-dev.yaml
-          git commit -m "ci: bump catalog-api image to ${{ github.sha }}"
+          git commit -m "ci: bump catalog-api to ${{ github.sha }} [dev]"
           git push
 
   build-orders-api:
     needs: detect-changes
     if: needs.detect-changes.outputs.orders == 'true'
     runs-on: ubuntu-latest
+    env:
+      SERVICE_DIR: services/orders-api
+      IMAGE: ghcr.io/${{ github.repository_owner }}/orders-api:${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests
+        working-directory: ${{ env.SERVICE_DIR }}
+        run: |
+          python3 -m venv .venv
+          . .venv/bin/activate
+          pip install --quiet -r requirements.txt pytest
+          pytest tests/ -v --junitxml=test-results.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orders-api-test-results
+          path: ${{ env.SERVICE_DIR }}/test-results.xml
+
+      - name: SAST - dependency and static analysis (report-only)
+        working-directory: ${{ env.SERVICE_DIR }}
+        run: |
+          . .venv/bin/activate
+          pip install --quiet pip-audit bandit
+          pip-audit -r requirements.txt --format json --output pip-audit-report.json || true
+          bandit -r src/ -f json -o bandit-report.json || true
+
+      - name: Upload SAST reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orders-api-sast-reports
+          path: ${{ env.SERVICE_DIR }}/*-report.json
+
+      - name: Build image (local, for scanning)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ env.SERVICE_DIR }}
+          push: false
+          load: true
+          tags: ${{ env.IMAGE }}
+
+      - name: Container scan - Trivy (blocking on HIGH/CRITICAL)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.IMAGE }}
+          severity: HIGH,CRITICAL
+          exit-code: 1
+          format: table
+
       - name: Log in to ghcr.io
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push orders-api image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./services/orders-api
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/orders-api:${{ github.sha }}
-      - name: Bump image tag in values-dev.yaml
+
+      - name: Push image
+        run: docker push ${{ env.IMAGE }}
+
+      - name: GitOps - bump image tag in values-dev.yaml
         run: |
-          sed -i "s|tag:.*|tag: \"${{ github.sha }}\"|" helm/orders-api/values-dev.yaml
+          sudo wget -q https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+          sudo chmod +x /usr/local/bin/yq
+          yq -i '.image.tag = "${{ github.sha }}"' helm/orders-api/values-dev.yaml
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add helm/orders-api/values-dev.yaml
-          git commit -m "ci: bump orders-api image to ${{ github.sha }}"
+          git commit -m "ci: bump orders-api to ${{ github.sha }} [dev]"
           git push
