@@ -12,5 +12,5 @@ test-results.xml
 terraform/environments/*/.terraform/
 terraform/environments/*/terraform.tfstate
 terraform/environments/*/terraform.tfstate.backup
-terraform/environments/*/tfplan
+terraform/environments/*/tfplan*
 terraform/environments/*/plan-output.txt
