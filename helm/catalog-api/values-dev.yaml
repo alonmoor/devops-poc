@@ -1,13 +1,10 @@
 # Dev: optimize for fast iteration, not resilience or cost efficiency.
 image:
   repository: ghcr.io/alonmoor/catalog-api
-  tag: "0e618781ac3a6b382067c943867762fc3d1ffb8b"
-
+  tag: "75768e97a7871450d090a5f5a5716bf2221d4bc4"
 replicaCount: 1
-
 autoscaling:
-  enabled: false   # predictable single replica, easier to debug
-
+  enabled: false # predictable single replica, easier to debug
 resources:
   requests:
     cpu: 25m
@@ -15,10 +12,8 @@ resources:
   limits:
     cpu: 500m
     memory: 256Mi
-
 podDisruptionBudget:
-  enabled: false   # a single replica has nothing to "disrupt" gracefully
-
+  enabled: false # a single replica has nothing to "disrupt" gracefully
 secrets:
   enabled: true
   vaultPath: "secret/data/dev/catalog-api"
