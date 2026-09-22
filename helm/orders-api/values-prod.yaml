@@ -28,3 +28,6 @@ secrets:
 
 networkPolicy:
   catalogApiNamespace: catalog-prod
+
+env:
+  catalogApiNamespace: catalog-prod
