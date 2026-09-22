@@ -1,0 +1,65 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgresql
+  namespace: postgresql
+  annotations:
+    meta.helm.sh/release-name: postgresql
+    meta.helm.sh/release-namespace: postgresql
+  labels:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: postgresql
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: primary
+      app.kubernetes.io/instance: postgresql
+      app.kubernetes.io/name: postgresql
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: catalog-dev
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: catalog-api
+      ports:
+        - port: 5432
+          protocol: TCP
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: catalog-prod
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: catalog-api
+      ports:
+        - port: 5432
+          protocol: TCP
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: orders-dev
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: orders-api
+      ports:
+        - port: 5432
+          protocol: TCP
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: orders-prod
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: orders-api
+      ports:
+        - port: 5432
+          protocol: TCP
+  egress:
+    - {}
