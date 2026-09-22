@@ -7,3 +7,10 @@ test-results.xml
 .terraform/
 *.tfstate
 *.tfstate.backup
+
+# Terraform local artifacts - never commit these
+terraform/environments/*/.terraform/
+terraform/environments/*/terraform.tfstate
+terraform/environments/*/terraform.tfstate.backup
+terraform/environments/*/tfplan
+terraform/environments/*/plan-output.txt

@@ -6,16 +6,14 @@ terraform {
   # WORKING ASSUMPTION: remote state backend (S3+DynamoDB, or Terraform
   # Cloud) configured per-environment here; omitted from this POC snippet
   # since the bucket/table names are org-specific and out of scope.
-  backend "s3" {
-    bucket = "devops-poc-tfstate"
-    key    = "dev/namespace.tfstate"
-    region = "eu-west-1"
+  backend "local" {
+    path = "terraform.tfstate"
   }
 }
 
 provider "kubernetes" {
   config_path    = "~/.kube/config"
-  config_context = "dev-cluster"
+  config_context = "kubernetes-admin@kubernetes"
   # WORKING ASSUMPTION: single shared cluster with per-env namespaces here
   # (context stays the same across dev/staging/prod). If the org instead
   # chooses separate clusters per environment (see docs/DECISIONS.md -
@@ -24,7 +22,7 @@ provider "kubernetes" {
 }
 
 provider "vault" {
-  address = "https://vault.internal.example.com"
+  address = "http://127.0.0.1:8200"
 }
 
 module "catalog_namespace" {
