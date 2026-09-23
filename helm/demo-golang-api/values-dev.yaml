@@ -5,7 +5,7 @@ autoscaling:
 ingress:
   enabled: true
   className: nginx
-  host: "kubernetes-course.devopsdirective.com"
+  host: "kubernetes-course.dev.local"
   path: "/api/golang"
   tlsSecretName: ""
 
