@@ -1,0 +1,6 @@
+apiVersion: v2
+name: demo-postgres
+description: Lightweight dedicated PostgreSQL for demo-golang-api/demo-node-api (empty DB, no tables/data - matches the course's own setup)
+type: application
+version: 0.1.0
+appVersion: "16"

@@ -1,0 +1,55 @@
+image:
+  repository: sidpalas/devops-directive-docker-course-api-golang
+  tag: foobarbaz
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+service:
+  port: 8000
+
+ingress:
+  enabled: false
+  className: nginx
+  host: ""
+  path: "/api/golang"
+  tlsSecretName: ""
+
+serviceAccount:
+  create: true
+  automountServiceAccountToken: false
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    cpu: 200m
+    memory: 100Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 75
+
+probes:
+  liveness:
+    path: /ping
+  readiness:
+    path: /ping
+  startup:
+    path: /ping
+    failureThreshold: 18
+    periodSeconds: 5
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
+secrets:
+  enabled: false
+  vaultPath: ""
+
+networkPolicy:
+  ingressControllerNamespace: ingress-nginx

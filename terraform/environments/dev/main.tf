@@ -54,3 +54,18 @@ module "orders_namespace" {
     pods            = 20
   }
 }
+
+module "demo_namespace" {
+  source      = "../../modules/namespace"
+  environment = "dev"
+  namespace   = "demo-dev"
+  team_group  = "team-demo-devs" # devops-poc assignment demo services (golang-api, node-api, postgres)
+
+  resource_quota = {
+    requests_cpu    = "1"
+    requests_memory = "2Gi"
+    limits_cpu      = "2"
+    limits_memory   = "4Gi"
+    pods            = 20
+  }
+}

@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "app.name" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "app.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  ingress:
+    # Only the two demo API pods, in this SAME namespace (no
+    # namespaceSelector = same-namespace-only), may reach Postgres.
+    # Never exposed to the ingress controller or any other namespace.
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: demo-golang-api
+      ports:
+        - protocol: TCP
+          port: 5432
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: demo-node-api
+      ports:
+        - protocol: TCP
+          port: 5432

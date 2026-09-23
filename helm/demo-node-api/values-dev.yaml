@@ -1,0 +1,14 @@
+replicaCount: 1
+autoscaling:
+  enabled: false
+
+ingress:
+  enabled: true
+  className: nginx
+  host: "kubernetes-course.devopsdirective.com"
+  path: "/api/node"
+  tlsSecretName: ""
+
+secrets:
+  enabled: true
+  vaultPath: "secret/data/dev/demo-node-api"

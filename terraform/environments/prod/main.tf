@@ -46,3 +46,18 @@ module "orders_namespace" {
     pods            = 50
   }
 }
+
+module "demo_namespace" {
+  source      = "../../modules/namespace"
+  environment = "prod"
+  namespace   = "demo-prod"
+  team_group  = "team-platform-oncall"
+
+  resource_quota = {
+    requests_cpu    = "4"
+    requests_memory = "8Gi"
+    limits_cpu      = "8"
+    limits_memory   = "16Gi"
+    pods            = 30
+  }
+}

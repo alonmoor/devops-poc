@@ -25,6 +25,12 @@ spec:
                   nsPrefix: catalog
                 - service: orders-api
                   nsPrefix: orders
+                - service: demo-postgres
+                  nsPrefix: demo
+                - service: demo-golang-api
+                  nsPrefix: demo
+                - service: demo-node-api
+                  nsPrefix: demo
           - list:
               elements:
                 - env: dev
@@ -70,6 +76,12 @@ spec:
             nsPrefix: catalog
           - service: orders-api
             nsPrefix: orders
+          - service: demo-postgres
+            nsPrefix: demo
+          - service: demo-golang-api
+            nsPrefix: demo
+          - service: demo-node-api
+            nsPrefix: demo
   template:
     metadata:
       name: "{{service}}-prod"

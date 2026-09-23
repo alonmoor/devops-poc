@@ -1,0 +1,23 @@
+image:
+  repository: postgres
+  tag: "16-alpine"
+  pullPolicy: IfNotPresent
+
+storage:
+  size: 1Gi
+  storageClassName: ""   # "" = cluster default StorageClass
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+service:
+  port: 5432
+
+secrets:
+  enabled: false
+  vaultPath: ""

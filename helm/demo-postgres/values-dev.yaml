@@ -1,0 +1,6 @@
+storage:
+  size: 1Gi
+
+secrets:
+  enabled: true
+  vaultPath: "secret/data/dev/demo-postgres"

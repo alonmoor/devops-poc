@@ -1,0 +1,6 @@
+apiVersion: v2
+name: demo-golang-api
+description: Demo Go API (DevOps Directive Kubernetes course) - queries Postgres for current time + request count
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

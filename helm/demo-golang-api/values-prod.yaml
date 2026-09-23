@@ -1,0 +1,29 @@
+replicaCount: 2
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+ingress:
+  enabled: true
+  className: nginx
+  host: "kubernetes-course.devopsdirective.com"
+  path: "/api/golang"
+  tlsSecretName: "demo-prod-tls"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 300m
+    memory: 150Mi
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+secrets:
+  enabled: true
+  vaultPath: "secret/data/prod/demo-golang-api"

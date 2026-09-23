@@ -1,0 +1,14 @@
+storage:
+  size: 5Gi
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+secrets:
+  enabled: true
+  vaultPath: "secret/data/prod/demo-postgres"
