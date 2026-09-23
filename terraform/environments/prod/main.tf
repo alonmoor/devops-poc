@@ -48,10 +48,16 @@ module "orders_namespace" {
 }
 
 module "demo_namespace" {
-  source      = "../../modules/namespace"
-  environment = "prod"
-  namespace   = "demo-prod"
-  team_group  = "team-platform-oncall"
+  source                = "../../modules/namespace"
+  environment           = "prod"
+  namespace             = "demo-prod"
+  team_group            = "team-platform-oncall"
+  # local-path-provisioner (this cluster's default StorageClass) doesn't
+  # honor fsGroup, so demo-postgres needs a root initContainer to chown
+  # its volume on first boot - incompatible with "restricted" PSA.
+  # Relaxed to "baseline" for this namespace only; every other prod
+  # namespace (catalog-prod, orders-prod) stays "restricted".
+  psa_enforce_override  = "baseline"
 
   resource_quota = {
     requests_cpu    = "4"

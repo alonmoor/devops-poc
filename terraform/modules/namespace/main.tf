@@ -11,7 +11,7 @@ resource "kubernetes_namespace" "this" {
     name = var.namespace
     labels = {
       "environment"                        = var.environment
-      "pod-security.kubernetes.io/enforce" = var.environment == "prod" ? "restricted" : "baseline"
+      "pod-security.kubernetes.io/enforce" = coalesce(var.psa_enforce_override, var.environment == "prod" ? "restricted" : "baseline")
       # dev/staging run under "baseline" PSA so teams aren't fighting the
       # restricted profile while iterating; prod enforces "restricted"
       # (non-root, no privilege escalation, dropped capabilities - all of

@@ -33,3 +33,9 @@ variable "vault_kubernetes_backend_path" {
   type        = string
   default     = "kubernetes"
 }
+
+variable "psa_enforce_override" {
+  description = "Override the environment-derived PodSecurity enforce level (baseline/restricted/privileged). Leave null for the normal dev/staging=baseline, prod=restricted rule."
+  type        = string
+  default     = null
+}
