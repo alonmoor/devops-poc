@@ -65,6 +65,8 @@ spec:
             - name: data
               mountPath: /var/lib/postgresql/data
               subPath: pgdata
+            - name: initdb-scripts
+              mountPath: /docker-entrypoint-initdb.d
           readinessProbe:
             exec:
               command: ["pg_isready", "-U", "demo"]
@@ -75,6 +77,10 @@ spec:
               command: ["pg_isready", "-U", "demo"]
             initialDelaySeconds: 15
             periodSeconds: 20
+      volumes:
+        - name: initdb-scripts
+          configMap:
+            name: {{ include "app.name" . }}-init-sql
   volumeClaimTemplates:
     - metadata:
         name: data
